@@ -15,7 +15,7 @@ def mostrar_menu():
 
 # Funciones vacías por ahora (las iremos rellenando juntos)
 def registrar_ingreso():
-    print("\n[Función 1] Aquí capturaremos el concepto y cantidad del ingreso.")
+    print("\n--- REGISTRAR NUEVO INGRESO ---")
 
 def registrar_gasto():
     print("\n[Función 2] Aquí capturaremos la categoría, tipo y cantidad del gasto.")
@@ -26,23 +26,101 @@ def consultar_movimientos():
 def modificar_movimiento():
     print("\n[Función 4] Aquí buscaremos y modificaremos un movimiento.")
 
-def eliminar_movimiento():
-    print("\n[Función 5] Aquí buscaremos y eliminaremos un movimiento.")
 
-def generar_resumen():
-    print("\n[Función 6] Aquí calcularemos totales, saldo, semáforo y categoría con mayor gasto.")
+def eliminar_movimiento(ingresos, gastos):
+    print("\n---Eliminar Movimiento---")
+    
+    if not ingresos and not gastos:
+        print("[Aviso] No hay movimientos registrados para eliminar.")
+        return
+        
+    print("1. Eliminar un ingreso")
+    print("2. Eliminar un gasto")
+    
+    opcion = input("\nSelecciona una opción (1-2): ")
+    
+    if opcion == "1":
+        if not ingresos:
+            print("[Aviso] No hay ingresos registrados.")
+            return
+        
+        # Mostrar los ingresos con su índice para que el usuario sepa cuál borrar
+        for i, ing in enumerate(ingresos, start=1):
+            print(f"{i}. {ing}")
+            
+        indice = int(input("\nSelecciona el número del ingreso para eliminar: ")) - 1
+        if 0 <= indice < len(ingresos):
+            eliminado = ingresos.pop(indice)
+            print(f"[Éxito] Ingreso eliminado correctamente.")
+        else:
+            print("[Error] Número fuera de rango.")
+            
+    elif opcion == "2":
+        if not gastos:
+            print("[Aviso] No hay gastos registrados.")
+            return
+            
+        for i, gas in enumerate(gastos, start=1):
+            print(f"{i}. {gas}")
+            
+        indice = int(input("\nSelecciona el número del gasto para eliminar: ")) - 1
+        if 0 <= indice < len(gastos):
+            eliminado = gastos.pop(indice)
+            print(f"[Éxito] Gasto eliminado correctamente.")
+        else:
+            print("[Error] Número fuera de rango.")             
+
+
+def generar_resumen(ingresos, gastos, meta):
+    print("\n--- RESUMEN Y SEMÁFORO FINANCIERO ---")
+
+    total_ingresos = sum(item['cantidad'] for item in ingresos)
+    total_gastos = sum(item['cantidad'] for item in gastos)
+    saldo = total_ingresos - total_gastos
+
+    print(f"Total Ingresos: ${total_ingresos:.2f}")
+    print(f"Total Gastos: ${total_gastos:.2f}")
+    print(f"Saldo Actual: ${saldo:.2f}")
+    if saldo >= meta:
+        print("¡Felicidades! Has alcanzado tu meta de ahorro.")
+    else:
+        print("Aún no has alcanzado tu meta de ahorro.")
+    
+    if saldo > 0:
+        print("Semáforo: VERDE (Tienes un saldo positivo)")
+    elif saldo == 0:
+        print("Semáforo: AMARILLO (Estás en punto de equilibrio)")
+    else:
+        print("Semáforo: ROJO (Cuidado, tus gastos superan tus ingresos)")
+
 
 def gestionar_meta():
-    print("\n[Función 7] Aquí capturaremos y guardaremos la meta y el ahorro mensual.")
+    print("Gestionar meta de ahorro")
+    try:
+        nueva_meta = float(input("Ingresa la cantidad de tu meta de ahorro ($): "))
+        if nueva_meta <= 0:
+            print("[Error] La meta no puede ser una cantidad negativa.")
+            return None
+        
+        print(f"[Éxito] Meta de ahorro establecida en: ${nueva_meta:.2f}")
+        return nueva_meta
+    except ValueError:
+        print("[Debes ingresar un número válido.")
+        return None
 
-def ver_meta():
-    print("\n[Función 8] Aquí consultaremos y mostraremos el monto de la meta.")
+def ver_meta(meta):
+    if meta <= 0:
+        print("[Aviso] No has establecido una meta de ahorro todavía.")
+        print("Usa la opción 7 para establecer una.")
+    else:
+        print(f"\n--- TU META DE AHORRO ACTUAL ---")
+        print(f"Meta establecida: ${meta:.2f}")
 
 def main():
     # Listas para almacenar los datos del proyecto
     ingresos = []
     gastos = []
-    
+    meta_ahorro = 0
     while True:
         mostrar_menu()
         
@@ -58,13 +136,15 @@ def main():
             elif opcion == 4:
                 modificar_movimiento()
             elif opcion == 5:
-                eliminar_movimiento()
+                eliminar_movimiento(ingresos, gastos)
             elif opcion == 6:
-                generar_resumen()
+                generar_resumen(ingresos, gastos, meta_ahorro)
             elif opcion == 7:
-                gestionar_meta()
+                resultado_meta = gestionar_meta()
+                if resultado_meta is not None:
+                    meta_ahorro = resultado_meta    
             elif opcion == 8:
-                ver_meta()
+                ver_meta(meta_ahorro)
             elif opcion == 9:
                 print("\nPrograma finalizado. ¡Hasta luego!")
                 break
